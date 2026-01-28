@@ -19,8 +19,9 @@ const DEFAULT_CONFIG: SiteConfig = {
 
 const App: React.FC = () => {
   // Logic định tuyến đơn giản: Kiểm tra URL để xác định view
+  // Sử dụng startsWith để chấp nhận cả /admin và /admin/
   const [view, setView] = useState<ViewMode>(() => 
-    window.location.pathname === '/admin' ? 'admin' : 'search'
+    window.location.pathname.startsWith('/admin') ? 'admin' : 'search'
   );
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -118,7 +119,7 @@ const App: React.FC = () => {
 
     // Lắng nghe sự kiện thay đổi lịch sử duyệt web (Back/Forward) để cập nhật view
     const handlePopState = () => {
-      setView(window.location.pathname === '/admin' ? 'admin' : 'search');
+      setView(window.location.pathname.startsWith('/admin') ? 'admin' : 'search');
     };
     window.addEventListener('popstate', handlePopState);
 
@@ -313,14 +314,7 @@ const App: React.FC = () => {
       {/* Đã xóa thanh công cụ điều hướng. Truy cập admin thông qua URL /admin */}
 
       <main className="flex-grow py-10 px-4">
-        {view === 'search' ? (
-          <div className="w-full max-w-4xl mx-auto">
-            <h2 className="text-3xl font-black text-blue-900 text-center uppercase mb-10">{siteConfig.main_title}</h2>
-            {error && <div className="max-w-xl mx-auto mb-6 p-4 bg-red-50 text-red-700 rounded-lg">{error}</div>}
-            <SearchForm onSearch={handleSearch} loading={loading} />
-            {result && <ResultView result={result} onClose={() => setResult(null)} />}
-          </div>
-        ) : (
+        {view === 'admin' ? (
           <div className="w-full max-w-7xl mx-auto">
             {!isLoggedIn ? (
               <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl space-y-6">
@@ -379,6 +373,13 @@ const App: React.FC = () => {
                 onLogout={handleLogout}
               />
             )}
+          </div>
+        ) : (
+          <div className="w-full max-w-4xl mx-auto">
+            <h2 className="text-3xl font-black text-blue-900 text-center uppercase mb-10">{siteConfig.main_title}</h2>
+            {error && <div className="max-w-xl mx-auto mb-6 p-4 bg-red-50 text-red-700 rounded-lg">{error}</div>}
+            <SearchForm onSearch={handleSearch} loading={loading} />
+            {result && <ResultView result={result} onClose={() => setResult(null)} />}
           </div>
         )}
       </main>
